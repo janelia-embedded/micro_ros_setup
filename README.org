@@ -11,7 +11,17 @@
 ** First micro-ROS Application on Linux
 
    #+BEGIN_SRC sh
-     docker pull microros/base:dashing
+     sudo apt install virtualbox
+
+   #+END_SRC
+
+
+   #+BEGIN_SRC sh
      docker run -it microros/base:dashing
+     apt update && apt install -y liblog4cxx-dev clang && rm -rf /var/lib/apt/list/*
      ros2 run micro_ros_setup create_firmware_ws.sh host
+     ros2 run micro_ros_setup create_agent_ws.sh
+     ros2 run micro_ros_setup build_firmware.sh
+
+     docker run -it microros/micro-ros-demos:dashing bash
    #+END_SRC

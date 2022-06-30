@@ -1,27 +1,63 @@
-#+TITLE: Micro-ROS Teensy
+#+TITLE: Micro-ROS Setup
 #+AUTHOR: Peter Polidoro
 #+EMAIL: peter@polidoro.io
 
 * Repository Information
-  - Author :: Peter Polidoro
-  - License :: BSD
+- Author :: Peter Polidoro
+- License :: BSD
 
-* micro-ROS Tutorials
+* Docker
 
-** First micro-ROS Application on Linux
+** Docker on host machine
 
-   #+BEGIN_SRC sh
-     sudo apt install virtualbox
+*** Debian-based
 
-   #+END_SRC
+#+BEGIN_SRC sh
 
+sudo apt-get remove docker docker-engine docker.io containerd runc
+sudo apt-get update
+sudo apt-get install \
+     ca-certificates \
+     curl \
+     gnupg \
+     lsb-release -y
+sudo mkdir -p /etc/apt/keyrings
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+echo \
+    "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
+  $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+sudo apt-get update
+sudo apt-get install docker-ce docker-ce-cli containerd.io docker-compose-plugin -y
+sudo groupadd docker
+sudo usermod -aG docker $USER
 
-   #+BEGIN_SRC sh
-     docker run -it microros/base:dashing
-     apt update && apt install -y liblog4cxx-dev clang && rm -rf /var/lib/apt/list/*
-     ros2 run micro_ros_setup create_firmware_ws.sh host
-     ros2 run micro_ros_setup create_agent_ws.sh
-     ros2 run micro_ros_setup build_firmware.sh
+#+END_SRC
 
-     docker run -it microros/micro-ros-demos:dashing bash
-   #+END_SRC
+** Pull Docker Image
+
+#+BEGIN_SRC sh
+
+docker pull microros/base:galactic
+
+#+END_SRC
+
+** Run Docker Image
+
+#+BEGIN_SRC sh
+
+docker run -it --rm --network host -v ~/micro-ros-zephyr:/micro-ros-zephyr microros/base:galactic
+
+#+END_SRC
+
+** Run ROS commands
+
+#+BEGIN_SRC sh
+
+sudo apt update && rosdep update
+rosdep install --from-paths src --ignore-src -y
+. install/setup.bash
+ros2 run micro_ros_setup create_firmware_ws.sh zephyr olimex-stm32-e407
+ros2 run micro_ros_setup configure_firmware.sh ping_pong --transport serial-usb
+ros2 run micro_ros_setup build_firmware.sh
+
+#+END_SRC

@@ -33,11 +33,11 @@ sudo usermod -aG docker $USER
 
 #+END_SRC
 
-** Pull Docker Image
+** Build Docker Image
 
 #+BEGIN_SRC sh
 
-docker pull microros/base:galactic
+docker build -t micro-ros-tutorial:galactic .
 
 #+END_SRC
 
@@ -45,7 +45,7 @@ docker pull microros/base:galactic
 
 #+BEGIN_SRC sh
 
-docker run -it --rm --network host -v ~/micro-ros-zephyr:/micro-ros-zephyr microros/base:galactic
+docker run -it --rm --network host -v ~/micro-ros-zephyr:/micro-ros-zephyr micro-ros-tutorial:galactic bash
 
 #+END_SRC
 
@@ -53,11 +53,9 @@ docker run -it --rm --network host -v ~/micro-ros-zephyr:/micro-ros-zephyr micro
 
 #+BEGIN_SRC sh
 
-sudo apt update && rosdep update
-rosdep install --from-paths src --ignore-src -y
 . install/setup.bash
-ros2 run micro_ros_setup create_firmware_ws.sh zephyr olimex-stm32-e407
-ros2 run micro_ros_setup configure_firmware.sh ping_pong --transport serial-usb
+ros2 run micro_ros_setup create_firmware_ws.sh zephyr nucleo_h743zi
+ros2 run micro_ros_setup configure_firmware.sh int32_publisher --transport udp
 ros2 run micro_ros_setup build_firmware.sh
 
 #+END_SRC
